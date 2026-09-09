@@ -148,9 +148,10 @@
         <div class="container">
             <h2>Newsletter</h2>
             <p>Get updates on new releases</p>
-            <form class="newsletter-form" id="newsletter-form">
-                <input type="email" placeholder="your@email.com" required>
+            <form class="newsletter-form" id="newsletter-form" action="https://formspree.io/f/mkjnpery" method="POST">
+                <input type="email" name="email" placeholder="your@email.com" required>
                 <button type="submit" data-sfx="tick">Subscribe</button>
+                <p class="newsletter-status" id="newsletter-status" role="status" aria-live="polite"></p>
             </form>
         </div>
     </section>

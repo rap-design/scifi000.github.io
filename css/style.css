@@ -707,7 +707,16 @@ section[id] {
 
 .newsletter-form {
     display: flex;
+    flex-wrap: wrap;
     gap: 1rem;
+}
+
+.newsletter-status {
+    flex-basis: 100%;
+    margin: 0;
+    font-size: 0.8rem;
+    color: #ff8a8a;
+    min-height: 1em;
 }
 
 .newsletter-form input {

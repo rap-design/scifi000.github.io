@@ -286,26 +286,49 @@ muteButton.addEventListener('click', function () {
 });
 
 /* ============================================================
-   Newsletter — lightweight confirmation, no real backend wired
-   yet, but avoids a hard page reload and gives feedback.
+   Newsletter — submits to Formspree via fetch, no page reload.
    ============================================================ */
 if (newsletterForm) {
     newsletterForm.addEventListener('submit', function (event) {
         event.preventDefault();
         const button = newsletterForm.querySelector('button[type="submit"]');
         const input = newsletterForm.querySelector('input[type="email"]');
+        const status = document.getElementById('newsletter-status');
         if (!button || !input || !input.value) return;
 
-        playConfirmChime();
         const originalLabel = button.textContent;
-        button.textContent = 'Subscribed';
-        button.classList.add('sent');
-        input.value = '';
+        button.disabled = true;
+        button.textContent = 'Sending...';
+        if (status) status.textContent = '';
 
-        setTimeout(function () {
-            button.textContent = originalLabel;
-            button.classList.remove('sent');
-        }, 2200);
+        fetch(newsletterForm.action, {
+            method: 'POST',
+            body: new FormData(newsletterForm),
+            headers: { 'Accept': 'application/json' }
+        })
+            .then(function (response) {
+                if (response.ok) {
+                    playConfirmChime();
+                    button.textContent = 'Subscribed';
+                    button.classList.add('sent');
+                    input.value = '';
+                    setTimeout(function () {
+                        button.textContent = originalLabel;
+                        button.classList.remove('sent');
+                        button.disabled = false;
+                    }, 2200);
+                } else {
+                    return response.json().then(function (data) {
+                        throw new Error((data && data.errors && data.errors[0] && data.errors[0].message) || 'Submission failed');
+                    });
+                }
+            })
+            .catch(function (err) {
+                button.textContent = originalLabel;
+                button.disabled = false;
+                if (status) status.textContent = 'Something went wrong — please try again.';
+                console.error('Newsletter submit error:', err);
+            });
     });
 }
 
